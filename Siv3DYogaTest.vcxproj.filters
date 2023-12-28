@@ -1047,5 +1047,11 @@
     <ClInclude Include="WidgetTreeEditor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="yoga\yoga\algorithm\TrailingPosition.h">
+      <Filter>Header Files\yoga</Filter>
+    </ClInclude>
+    <ClInclude Include="yoga\yoga\style\StyleLength.h">
+      <Filter>Header Files\yoga</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

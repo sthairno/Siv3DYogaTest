@@ -371,6 +371,7 @@
     <ClInclude Include="yoga\yoga\algorithm\PixelGrid.h" />
     <ClInclude Include="yoga\yoga\algorithm\ResolveValue.h" />
     <ClInclude Include="yoga\yoga\algorithm\SizingMode.h" />
+    <ClInclude Include="yoga\yoga\algorithm\TrailingPosition.h" />
     <ClInclude Include="yoga\yoga\bits\BitCast.h" />
     <ClInclude Include="yoga\yoga\config\Config.h" />
     <ClInclude Include="yoga\yoga\debug\AssertFatal.h" />
@@ -403,6 +404,7 @@
     <ClInclude Include="yoga\yoga\numeric\FloatOptional.h" />
     <ClInclude Include="yoga\yoga\style\CompactValue.h" />
     <ClInclude Include="yoga\yoga\style\Style.h" />
+    <ClInclude Include="yoga\yoga\style\StyleLength.h" />
     <ClInclude Include="yoga\yoga\style\ValueFactories.h" />
     <ClInclude Include="yoga\yoga\YGConfig.h" />
     <ClInclude Include="yoga\yoga\YGEnums.h" />

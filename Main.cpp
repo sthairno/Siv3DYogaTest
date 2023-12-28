@@ -40,21 +40,25 @@ void Main()
 		Rect rect = Scene::Rect().stretched(-Padding);
 		rect.drawFrame(0, 10, Palette::Lightgray);
 
+		Transformer2D tf{ Mat3x2::Translate(rect.pos), TransformCursor::Yes };
+
+		// レイアウトを計算
+		tree.calculateLayout(rect.size);
+
+		// nameが"red"のウィジェットを列挙して赤い四角を描画
+		for (auto widget : rootWidget->queryAll(U"red"))
 		{
-			Transformer2D tf{ Mat3x2::Translate(rect.pos), TransformCursor::Yes };
+			widget->layoutResults()->rect().draw(Palette::Red);
+		}
 
-			// レイアウトを計算
-			tree.calculateLayout(rect.size);
+		// ウィジェットを描画
+		rootWidget->draw();
 
-			// ウィジェットを描画
-			rootWidget->draw();
-
-			// UIを編集
-			if (editor.update())
-			{
-				// 変更があったらLayoutTreeを再構築
-				tree.construct(rootWidget);
-			}
+		// UIを編集
+		if (editor.update())
+		{
+			// 変更があったらLayoutTreeを再構築
+			tree.construct(rootWidget);
 		}
 	}
 }

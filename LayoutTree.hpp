@@ -9,6 +9,8 @@ public:
 
 	LayoutTree();
 
+	LayoutTree(std::shared_ptr<Widget> root);
+
 	void construct(std::shared_ptr<Widget> root);
 
 	void cleanCache();

@@ -130,6 +130,12 @@ public:
 LayoutTree::LayoutTree()
 	: m_impl(new Impl()) { }
 
+LayoutTree::LayoutTree(std::shared_ptr<Widget> root)
+	: m_impl(new Impl())
+{
+	construct(root);
+}
+
 LayoutTree::~LayoutTree() { }
 
 void LayoutTree::construct(std::shared_ptr<Widget> root)

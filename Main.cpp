@@ -16,28 +16,43 @@ void Main()
 
 	constexpr int32 Padding = 50;
 
-	std::shared_ptr<Widget> rootWidget = std::make_shared<Widget>();
+	// WidgetTree
+	auto rootWidget = std::make_shared<Widget>();
+	{
+		// labelWidgetを中央に配置
+		rootWidget->style().setJustifyContent(facebook::yoga::Justify::Center);
+		rootWidget->style().setAlignItems(facebook::yoga::Align::Center);
 
-	WidgetTreeEditor editor(rootWidget);
+		// labelWidgetをrootWidgetに追加
+		auto labelWidget = std::make_shared<Label>(U"Siv3DYogaTest", Palette::Black);
+		rootWidget->children.emplace_back(std::move(labelWidget));
+	}
 
-	LayoutTree tree;
-	tree.construct(rootWidget);
+	// WidgetTreeを編集するエディタ
+	WidgetTreeEditor editor{ rootWidget };
+
+	// WidgetTreeからLayoutTreeを構築
+	LayoutTree tree{ rootWidget };
 
 	while (System::Update())
 	{
+		// 表示する領域のRect
 		Rect rect = Scene::Rect().stretched(-Padding);
-
 		rect.drawFrame(0, 10, Palette::Lightgray);
 
 		{
 			Transformer2D tf{ Mat3x2::Translate(rect.pos), TransformCursor::Yes };
 
+			// レイアウトを計算
 			tree.calculateLayout(rect.size);
 
+			// ウィジェットを描画
 			rootWidget->draw();
 
+			// WidgetTreeを編集
 			if (editor.update())
 			{
+				// 変更があったらWidgetTreeを再構築
 				tree.construct(rootWidget);
 			}
 		}

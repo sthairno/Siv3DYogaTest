@@ -88,6 +88,42 @@ void Widget::setStyle(const yoga::Style& style)
 	}
 }
 
+std::shared_ptr<Widget> Widget::query(const StringView value)
+{
+	auto result = queryAll(value, 1);
+	return result.empty() ? nullptr : result.at(0);
+}
+
+Array<std::shared_ptr<Widget>> Widget::queryAll(const StringView value, size_t limit)
+{
+	Array<std::shared_ptr<Widget>> result;
+	queryAll(value, result, limit);
+	return result;
+}
+
+void Widget::queryAll(const StringView value, Array<std::shared_ptr<Widget>>& result, size_t limit)
+{
+	for (auto& child : children)
+	{
+		child->queryAll(value, result, limit);
+
+		if (result.size() >= limit)
+		{
+			return;
+		}
+	}
+
+	if (result.size() >= limit)
+	{
+		return;
+	}
+
+	if (name == value)
+	{
+		result.push_back(shared_from_this());
+	}
+}
+
 void Widget::draw()
 {
 	drawContent(*layoutResults());

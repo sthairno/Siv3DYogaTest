@@ -6,7 +6,7 @@
 class LayoutTree;
 namespace facebook::yoga { class Node; }
 
-class Widget
+class Widget : private std::enable_shared_from_this<Widget>
 {
 public:
 
@@ -36,6 +36,8 @@ public:
 
 public:
 
+	String name;
+
 	std::list<std::shared_ptr<Widget>> children;
 
 	int64 id() const { return m_id; }
@@ -51,6 +53,12 @@ public:
 	void setStyle(const facebook::yoga::Style& style);
 
 public:
+
+	std::shared_ptr<Widget> query(const StringView value);
+
+	Array<std::shared_ptr<Widget>> queryAll(const StringView value, size_t limit = Largest<size_t>);
+
+	void queryAll(const StringView value, Array<std::shared_ptr<Widget>>& result, size_t limit = Largest<size_t>);
 
 	void draw();
 

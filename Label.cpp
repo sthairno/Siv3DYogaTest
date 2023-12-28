@@ -50,7 +50,7 @@ void Label::setFont(Font font)
 	markLayoutDirty();
 }
 
-void Label::drawContent(LayoutResults layout) const
+void Label::drawContent(const LayoutResults& layout) const
 {
 	m_font(m_text).draw(layout.innerRect(), m_color);
 }

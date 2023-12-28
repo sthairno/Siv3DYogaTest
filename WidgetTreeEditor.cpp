@@ -442,16 +442,14 @@ bool WidgetTreeEditor::update()
 
 	// -----描画-----
 
-	Vec2 selectedWidgetPos = m_selectedWidget ? getWidgetOffset(m_selectedWidget) : Vec2::Zero();
-
 	// LayoutResultsを描画
 	if (hoveredWidget)
 	{
-		drawLayoutResults(getWidgetOffset(hoveredWidget), *hoveredWidget->layoutResults());
+		drawLayoutResults(*hoveredWidget->layoutResults());
 	}
 	else if (m_selectedWidget)
 	{
-		drawLayoutResults(selectedWidgetPos, *m_selectedWidget->layoutResults());
+		drawLayoutResults(*m_selectedWidget->layoutResults());
 	}
 
 
@@ -460,7 +458,7 @@ bool WidgetTreeEditor::update()
 	{
 		if (auto layout = m_selectedWidget->layoutResults())
 		{
-			layout->localRect.movedBy(selectedWidgetPos).drawFrame(0.5, 1.5, SelectedWidgetFrameColor);
+			layout->rect().drawFrame(0.5, 1.5, SelectedWidgetFrameColor);
 		}
 	}
 
@@ -470,8 +468,7 @@ bool WidgetTreeEditor::update()
 bool WidgetTreeEditor::mouseOverTest(
 	std::shared_ptr<Widget> widget,
 	std::shared_ptr<Widget>& hoveredWidget,
-	std::shared_ptr<Widget>& hoveredParentWidget,
-	Vec2 basePos)
+	std::shared_ptr<Widget>& hoveredParentWidget)
 {
 	auto layout = widget->layoutResults();
 
@@ -482,7 +479,7 @@ bool WidgetTreeEditor::mouseOverTest(
 
 	for (auto [i, child] : ReverseIndexedRef(widget->children))
 	{
-		if (mouseOverTest(child, hoveredWidget, hoveredParentWidget, basePos + layout->localRect.pos))
+		if (mouseOverTest(child, hoveredWidget, hoveredParentWidget))
 		{
 			if (!hoveredParentWidget)
 			{
@@ -492,7 +489,7 @@ bool WidgetTreeEditor::mouseOverTest(
 		}
 	}
 
-	if (layout->localRect.movedBy(basePos).mouseOver())
+	if (layout->rect().mouseOver())
 	{
 		hoveredWidget = widget;
 		return true;
@@ -501,16 +498,14 @@ bool WidgetTreeEditor::mouseOverTest(
 	return false;
 }
 
-void WidgetTreeEditor::drawLayoutResults(Vec2 pos, LayoutResults layout)
+void WidgetTreeEditor::drawLayoutResults(LayoutResults layout)
 {
-	layout.localRect.moveBy(pos);
-
-	for (auto polygon : Geometry2D::Subtract(layout.outerRect(), layout.localRect.asPolygon()))
+	for (auto polygon : Geometry2D::Subtract(layout.outerRect(), layout.rect().asPolygon()))
 	{
 		polygon.draw(MarginColor);
 	}
 
-	for (auto polygon : Geometry2D::Subtract(layout.localRect, layout.rectWithoutBorder().asPolygon()))
+	for (auto polygon : Geometry2D::Subtract(layout.rect(), layout.rectWithoutBorder().asPolygon()))
 	{
 		polygon.draw(BorderColor);
 	}
@@ -607,43 +602,4 @@ void WidgetTreeEditor::showSelectedWidgetEditor()
 		m_selectedWidget.reset();
 		m_selectedWidgetParent.reset();
 	}
-}
-
-Vec2 WidgetTreeEditor::getWidgetOffset(const std::shared_ptr<Widget>& widget)
-{
-	if (widget == m_root)
-	{
-		return { 0, 0 };
-	}
-
-	Vec2 offset{ 0, 0 };
-
-	getWidgetOffsetImpl(m_root, widget, offset);
-
-	return offset;
-}
-
-bool WidgetTreeEditor::getWidgetOffsetImpl(const std::shared_ptr<Widget>& widget, const std::shared_ptr<Widget>& target, Vec2& offset)
-{
-	auto layout = widget->layoutResults();
-	Vec2 prev = offset;
-
-	if (not layout.has_value())
-	{
-		return false;
-	}
-
-	offset += layout->localRect.pos;
-
-	for (auto& child : widget->children)
-	{
-		if (child == target || getWidgetOffsetImpl(child, target, offset))
-		{
-			return true;
-		}
-	}
-
-	offset = prev;
-
-	return false;
 }

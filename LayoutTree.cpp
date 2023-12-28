@@ -157,4 +157,50 @@ void LayoutTree::calculateLayout(float width, float height)
 		height,
 		yoga::Direction::Inherit
 	);
+
+	updateLayoutResults({ 0, 0 }, *m_root);
+}
+
+void LayoutTree::updateLayoutResults(Vec2 offset, Widget& widget)
+{
+	auto& node = *widget.m_node;
+	auto& layout = node.getLayout();
+
+	if (not widget.m_layoutResults.has_value() || node.getHasNewLayout())
+	{
+		widget.m_layoutResults = LayoutResults{
+			.margin = {
+				layout.margin(facebook::yoga::Edge::Left),
+				layout.margin(facebook::yoga::Edge::Top),
+				layout.margin(facebook::yoga::Edge::Right),
+				layout.margin(facebook::yoga::Edge::Bottom),
+			},
+			.localRect = {
+				layout.position(facebook::yoga::Edge::Left),
+				layout.position(facebook::yoga::Edge::Top),
+				layout.dimension(facebook::yoga::Dimension::Width),
+				layout.dimension(facebook::yoga::Dimension::Height)
+			},
+			.border = {
+				layout.border(facebook::yoga::Edge::Left),
+				layout.border(facebook::yoga::Edge::Top),
+				layout.border(facebook::yoga::Edge::Right),
+				layout.border(facebook::yoga::Edge::Bottom),
+			},
+			.padding = {
+				layout.padding(facebook::yoga::Edge::Left),
+				layout.padding(facebook::yoga::Edge::Top),
+				layout.padding(facebook::yoga::Edge::Right),
+				layout.padding(facebook::yoga::Edge::Bottom),
+			}
+		};
+	}
+
+	widget.m_layoutResults->offset = offset;
+
+	offset += widget.m_layoutResults->localRect.pos;
+	for (auto& child : widget.children)
+	{
+		updateLayoutResults(offset, *child);
+	}
 }

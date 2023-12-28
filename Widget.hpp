@@ -44,7 +44,7 @@ public:
 
 	facebook::yoga::Node* layoutNode() const { return m_node; }
 
-	Optional<LayoutResults> layoutResults() const;
+	const Optional<LayoutResults>& layoutResults() const { return m_layoutResults; }
 
 	facebook::yoga::Style& style();
 
@@ -70,7 +70,7 @@ protected:
 
 	void drawChildren() const;
 
-	virtual void drawContent(LayoutResults) const;
+	virtual void drawContent(const LayoutResults&) const;
 
 	virtual void onLayoutNodeAttach(facebook::yoga::Node&) { }
 
@@ -83,6 +83,8 @@ private:
 	facebook::yoga::Node* m_node = nullptr;
 
 	facebook::yoga::Style m_styleCache;
+
+	Optional<LayoutResults> m_layoutResults;
 
 	void attachNode(facebook::yoga::Node& node);
 

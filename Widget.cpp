@@ -14,44 +14,6 @@ Widget* Widget::GetInstance(const YGNodeConstRef node)
 	return reinterpret_cast<Widget*>(YGNodeGetContext(node));
 }
 
-Optional<LayoutResults> Widget::layoutResults() const
-{
-	auto node = layoutNode();
-
-	if (node == nullptr)
-	{
-		return none;
-	}
-
-	auto layout = node->getLayout();
-	return LayoutResults{
-		.margin = {
-			layout.margin(facebook::yoga::Edge::Left),
-			layout.margin(facebook::yoga::Edge::Top),
-			layout.margin(facebook::yoga::Edge::Right),
-			layout.margin(facebook::yoga::Edge::Bottom),
-		},
-		.localRect = {
-			layout.position(facebook::yoga::Edge::Left),
-			layout.position(facebook::yoga::Edge::Top),
-			layout.dimension(facebook::yoga::Dimension::Width),
-			layout.dimension(facebook::yoga::Dimension::Height)
-		},
-		.border = {
-			layout.border(facebook::yoga::Edge::Left),
-			layout.border(facebook::yoga::Edge::Top),
-			layout.border(facebook::yoga::Edge::Right),
-			layout.border(facebook::yoga::Edge::Bottom),
-		},
-		.padding = {
-			layout.padding(facebook::yoga::Edge::Left),
-			layout.padding(facebook::yoga::Edge::Top),
-			layout.padding(facebook::yoga::Edge::Right),
-			layout.padding(facebook::yoga::Edge::Bottom),
-		}
-	};
-}
-
 yoga::Style& Widget::style()
 {
 	if (m_node)
@@ -139,19 +101,15 @@ void Widget::markLayoutDirty()
 
 void Widget::drawChildren() const
 {
-	if (auto result = layoutResults())
+	for (auto child : children)
 	{
-		Transformer2D t(Mat3x2::Translate(result->localRect.pos));
-		for (auto child : children)
-		{
-			child->draw();
-		}
+		child->draw();
 	}
 }
 
-void Widget::drawContent(LayoutResults layout) const
+void Widget::drawContent(const LayoutResults& layout) const
 {
-	layout.localRect.drawFrame(1, Palette::Black);
+	layout.rect().drawFrame(1, Palette::Black);
 	drawChildren();
 }
 

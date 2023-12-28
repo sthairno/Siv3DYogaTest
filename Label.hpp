@@ -34,7 +34,7 @@ private:
 
 	Array<Glyph> m_glyphCache;
 
-	void drawContent(LayoutResults layout) const override;
+	void drawContent(const LayoutResults& layout) const override;
 
 	void onLayoutNodeAttach(facebook::yoga::Node& node) override;
 

@@ -31,15 +31,11 @@ private:
 
 	bool m_treeChanged = false;
 
-	bool mouseOverTest(std::shared_ptr<Widget> widget, std::shared_ptr<Widget>& hoveredWidget, std::shared_ptr<Widget>& hoveredParentWidget, Vec2 basePos = Vec2::Zero());
+	bool mouseOverTest(std::shared_ptr<Widget> widget, std::shared_ptr<Widget>& hoveredWidget, std::shared_ptr<Widget>& hoveredParentWidget);
 
-	void drawLayoutResults(Vec2 pos, LayoutResults layout);
+	void drawLayoutResults(LayoutResults layout);
 
 	void showPropertyEditor(Widget& widget);
 
 	void showSelectedWidgetEditor();
-
-	Vec2 getWidgetOffset(const std::shared_ptr<Widget>& widget);
-
-	bool getWidgetOffsetImpl(const std::shared_ptr<Widget>& widget, const std::shared_ptr<Widget>& target, Vec2& offset);
 };

@@ -25,6 +25,8 @@ private:
 
 	std::shared_ptr<Widget> m_root;
 
+	void updateLayoutResults(Vec2 offset, Widget& widget);
+
 public:
 
 	~LayoutTree();

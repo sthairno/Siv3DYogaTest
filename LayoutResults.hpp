@@ -14,6 +14,8 @@ struct Thickness
 
 struct LayoutResults
 {
+	Vec2 offset{ 0, 0 };
+
 	Thickness margin;
 
 	RectF localRect;
@@ -22,9 +24,14 @@ struct LayoutResults
 
 	Thickness padding;
 
+	RectF rect() const noexcept
+	{
+		return localRect.movedBy(offset);
+	}
+
 	RectF outerRect() const noexcept
 	{
-		return localRect.stretched(
+		return rect().stretched(
 			margin.top,
 			margin.right,
 			margin.bottom,
@@ -34,7 +41,7 @@ struct LayoutResults
 
 	RectF rectWithoutBorder() const noexcept
 	{
-		return localRect.stretched(
+		return rect().stretched(
 			-border.top,
 			-border.right,
 			-border.bottom,
@@ -44,7 +51,7 @@ struct LayoutResults
 
 	RectF innerRect() const noexcept
 	{
-		return localRect.stretched(
+		return rect().stretched(
 			-border.top - padding.top,
 			-border.right - padding.right,
 			-border.bottom - padding.bottom,

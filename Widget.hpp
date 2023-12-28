@@ -6,7 +6,7 @@
 class LayoutTree;
 namespace facebook::yoga { class Node; }
 
-class Widget : private std::enable_shared_from_this<Widget>
+class Widget : public std::enable_shared_from_this<Widget>
 {
 public:
 

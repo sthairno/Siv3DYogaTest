@@ -413,3 +413,7 @@ gmon.out
 # vcpkg
 
 /vcpkg_installed*/
+
+# Dear ImGui
+
+/App/imgui.ini

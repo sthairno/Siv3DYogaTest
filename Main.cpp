@@ -16,7 +16,7 @@ void Main()
 
 	constexpr int32 Padding = 50;
 
-	// WidgetTree
+	// UI
 	auto rootWidget = std::make_shared<Widget>();
 	{
 		// labelWidgetを中央に配置
@@ -28,10 +28,10 @@ void Main()
 		rootWidget->children.emplace_back(std::move(labelWidget));
 	}
 
-	// WidgetTreeを編集するエディタ
+	// UIを編集するエディタ
 	WidgetTreeEditor editor{ rootWidget };
 
-	// WidgetTreeからLayoutTreeを構築
+	// UIからLayoutTreeを構築
 	LayoutTree tree{ rootWidget };
 
 	while (System::Update())
@@ -49,10 +49,10 @@ void Main()
 			// ウィジェットを描画
 			rootWidget->draw();
 
-			// WidgetTreeを編集
+			// UIを編集
 			if (editor.update())
 			{
-				// 変更があったらWidgetTreeを再構築
+				// 変更があったらLayoutTreeを再構築
 				tree.construct(rootWidget);
 			}
 		}

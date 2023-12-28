@@ -417,7 +417,7 @@ bool WidgetTreeEditor::update()
 {
 	// 選択中のウィジェットを編集
 	showSelectedWidgetEditor();
-	
+
 	// mouseOver中のウィジェットを検索
 	std::shared_ptr<Widget> hoveredWidget, hoveredParentWidget;
 	if (!ImGui::GetIO().WantCaptureMouse)
@@ -543,10 +543,9 @@ void WidgetTreeEditor::showPropertyEditor(Widget& widget)
 
 void WidgetTreeEditor::showSelectedWidgetEditor()
 {
-	bool hasSelectedWidget = !!m_selectedWidget;
-	bool prevState = hasSelectedWidget;
+	bool isItemSelected = true;
 
-	if (hasSelectedWidget && ImGui::Begin("Selected Widget", &hasSelectedWidget))
+	if (m_selectedWidget && ImGui::Begin("Selected Widget", &isItemSelected, ImGuiWindowFlags_NoCollapse))
 	{
 		ImGui::Text("ID: 0x%08x (%s)", m_selectedWidget->id(), typeid(*m_selectedWidget.get()).name());
 
@@ -576,7 +575,7 @@ void WidgetTreeEditor::showSelectedWidgetEditor()
 			if (ImGui::Button("[-] Remove Widget") || (m_selectedWidgetParent && KeyDelete.down()))
 			{
 				m_selectedWidgetParent->children.remove(m_selectedWidget);
-				hasSelectedWidget = false;
+				isItemSelected = false;
 				m_treeChanged = true;
 			}
 			ImGui::EndDisabled();
@@ -603,7 +602,7 @@ void WidgetTreeEditor::showSelectedWidgetEditor()
 		ImGui::End();
 	}
 
-	if (!hasSelectedWidget && prevState)
+	if (!isItemSelected)
 	{
 		m_selectedWidget.reset();
 		m_selectedWidgetParent.reset();

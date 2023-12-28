@@ -546,6 +546,14 @@ void WidgetTreeEditor::showSelectedWidgetEditor()
 
 		if (ImGui::CollapsingHeader("Tree"))
 		{
+			auto name = Unicode::ToUTF8(m_selectedWidget->name);
+			if (ImGui::InputText("Name", &name))
+			{
+				m_selectedWidget->name = Unicode::FromUTF8(name);
+			}
+
+			ImGui::Spacing();
+
 			ImGui::BeginDisabled(!m_selectedWidget->allowChildren());
 			if (ImGui::Button("[+] Add Child Widget"))
 			{

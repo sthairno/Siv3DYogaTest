@@ -55,21 +55,20 @@ static std::optional<Type> CreateEnumCombo(const char* label, Type value)
 	return result;
 }
 
-static std::string CompactValueToString(yoga::CompactValue value)
+static std::string StyleLengthToString(yoga::StyleLength value)
 {
-	YGValue parsedValue = value;
-	switch (parsedValue.unit)
+	switch (value.unit())
 	{
-	case YGUnitUndefined: return "";
-	case YGUnitAuto: return "auto";
-	case YGUnitPoint: return fmt::format("{:.2f}", parsedValue.value);
-	case YGUnitPercent: return fmt::format("{:.2f}%", parsedValue.value * 100);
+	case yoga::Unit::Undefined: return "";
+	case yoga::Unit::Auto: return "auto";
+	case yoga::Unit::Point: return fmt::format("{:.2f}", value.value().unwrap());
+	case yoga::Unit::Percent: return fmt::format("{:.2f}%", value.value().unwrap() * 100);
 	}
 	return "";
 }
 
 
-static std::optional<yoga::CompactValue> TryParseCompactValue(std::string_view input)
+static std::optional<yoga::StyleLength> TryParseStyleLength(std::string_view input)
 {
 	constexpr auto trimCharList = " \t\v\r\n";
 
@@ -86,13 +85,13 @@ static std::optional<yoga::CompactValue> TryParseCompactValue(std::string_view i
 	// Undefined
 	if (input == "" || input == "undefined")
 	{
-		return yoga::CompactValue::ofUndefined();
+		return yoga::StyleLength::undefined();
 	}
 
 	// Auto
 	if (input == "auto")
 	{
-		return yoga::CompactValue::ofAuto();
+		return yoga::StyleLength::ofAuto();
 	}
 
 	// Percent
@@ -100,7 +99,7 @@ static std::optional<yoga::CompactValue> TryParseCompactValue(std::string_view i
 	{
 		try
 		{
-			return yoga::CompactValue::of<YGUnitPercent>(
+			return yoga::StyleLength::percent(
 				std::stof(std::string{ input.substr(0, input.size() - 1) }) / 100.f
 			);
 		}
@@ -113,7 +112,7 @@ static std::optional<yoga::CompactValue> TryParseCompactValue(std::string_view i
 	// Point
 	try
 	{
-		return yoga::CompactValue::of<YGUnitPoint>(
+		return yoga::StyleLength::points(
 			std::stof(std::string{ input })
 		);
 	}
@@ -123,18 +122,18 @@ static std::optional<yoga::CompactValue> TryParseCompactValue(std::string_view i
 	}
 }
 
-static std::optional<yoga::CompactValue> CreateCompactValueInput(
+static std::optional<yoga::StyleLength> CreateStyleLengthInput(
 	const char* label,
 	const char* hint,
-	yoga::CompactValue value)
+	yoga::StyleLength value)
 {
-	std::string str = CompactValueToString(value);
+	std::string str = StyleLengthToString(value);
 	if (ImGui::InputTextWithHint(
 		label, hint, &str,
 		ImGuiInputTextFlags_CharsNoBlank |
 		ImGuiInputTextFlags_EnterReturnsTrue))
 	{
-		return TryParseCompactValue(str);
+		return TryParseStyleLength(str);
 	}
 	return none;
 }
@@ -143,8 +142,8 @@ static bool CreateEdgeInput(
 	const char* id,
 	const char* label,
 	yoga::Style& style,
-	yoga::CompactValue(yoga::Style::* getter)(yoga::Edge) const,
-	void (yoga::Style::* setter)(yoga::Edge, yoga::CompactValue))
+	yoga::StyleLength(yoga::Style::* getter)(yoga::Edge) const,
+	void (yoga::Style::* setter)(yoga::Edge, yoga::StyleLength))
 {
 	bool valueChanged = false;
 
@@ -154,7 +153,7 @@ static bool CreateEdgeInput(
 
 		ImGui::TableSetColumnIndex(1);
 		ImGui::SetNextItemWidth(-FLT_MIN);
-		if (auto v = CreateCompactValueInput("##top", "", (style.*getter)(yoga::Edge::Top)))
+		if (auto v = CreateStyleLengthInput("##top", "", (style.*getter)(yoga::Edge::Top)))
 		{
 			(style.*setter)(yoga::Edge::Top, *v);
 			valueChanged = true;
@@ -164,7 +163,7 @@ static bool CreateEdgeInput(
 
 		ImGui::TableSetColumnIndex(0);
 		ImGui::SetNextItemWidth(-FLT_MIN);
-		if (auto v = CreateCompactValueInput("##left", "", (style.*getter)(yoga::Edge::Left)))
+		if (auto v = CreateStyleLengthInput("##left", "", (style.*getter)(yoga::Edge::Left)))
 		{
 			(style.*setter)(yoga::Edge::Left, *v);
 			valueChanged = true;
@@ -175,7 +174,7 @@ static bool CreateEdgeInput(
 
 		ImGui::TableSetColumnIndex(2);
 		ImGui::SetNextItemWidth(-FLT_MIN);
-		if (auto v = CreateCompactValueInput("##right", "", (style.*getter)(yoga::Edge::Right)))
+		if (auto v = CreateStyleLengthInput("##right", "", (style.*getter)(yoga::Edge::Right)))
 		{
 			(style.*setter)(yoga::Edge::Right, *v);
 			valueChanged = true;
@@ -185,7 +184,7 @@ static bool CreateEdgeInput(
 
 		ImGui::TableSetColumnIndex(1);
 		ImGui::SetNextItemWidth(-FLT_MIN);
-		if (auto v = CreateCompactValueInput("##bottom", "", (style.*getter)(yoga::Edge::Bottom)))
+		if (auto v = CreateStyleLengthInput("##bottom", "", (style.*getter)(yoga::Edge::Bottom)))
 		{
 			(style.*setter)(yoga::Edge::Bottom, *v);
 			valueChanged = true;
@@ -217,7 +216,7 @@ static bool ShowStyleEditor(yoga::Style& style)
 				valueChanged = true;
 			}
 
-			if (auto v = CreateCompactValueInput("Basis", "auto", style.flexBasis()))
+			if (auto v = CreateStyleLengthInput("Basis", "auto", style.flexBasis()))
 			{
 				style.setFlexBasis(*v);
 				valueChanged = true;
@@ -279,7 +278,7 @@ static bool ShowStyleEditor(yoga::Style& style)
 				ImGui::TableNextRow();
 				ImGui::TableSetColumnIndex(0);
 				ImGui::SetNextItemWidth(-FLT_MIN);
-				if (auto v = CreateCompactValueInput("#w", "auto", style.dimension(yoga::Dimension::Width)))
+				if (auto v = CreateStyleLengthInput("#w", "auto", style.dimension(yoga::Dimension::Width)))
 				{
 					style.setDimension(yoga::Dimension::Width, *v);
 					valueChanged = true;
@@ -287,7 +286,7 @@ static bool ShowStyleEditor(yoga::Style& style)
 
 				ImGui::TableSetColumnIndex(1);
 				ImGui::SetNextItemWidth(-FLT_MIN);
-				if (auto v = CreateCompactValueInput("#h", "auto", style.dimension(yoga::Dimension::Height)))
+				if (auto v = CreateStyleLengthInput("#h", "auto", style.dimension(yoga::Dimension::Height)))
 				{
 					style.setDimension(yoga::Dimension::Height, *v);
 					valueChanged = true;
@@ -302,7 +301,7 @@ static bool ShowStyleEditor(yoga::Style& style)
 				ImGui::TableNextRow();
 				ImGui::TableSetColumnIndex(0);
 				ImGui::SetNextItemWidth(-FLT_MIN);
-				if (auto v = CreateCompactValueInput("#w", "none", style.maxDimension(yoga::Dimension::Width)))
+				if (auto v = CreateStyleLengthInput("#w", "none", style.maxDimension(yoga::Dimension::Width)))
 				{
 					style.setMaxDimension(yoga::Dimension::Width, *v);
 					valueChanged = true;
@@ -310,7 +309,7 @@ static bool ShowStyleEditor(yoga::Style& style)
 
 				ImGui::TableSetColumnIndex(1);
 				ImGui::SetNextItemWidth(-FLT_MIN);
-				if (auto v = CreateCompactValueInput("#h", "none", style.maxDimension(yoga::Dimension::Height)))
+				if (auto v = CreateStyleLengthInput("#h", "none", style.maxDimension(yoga::Dimension::Height)))
 				{
 					style.setMaxDimension(yoga::Dimension::Height, *v);
 					valueChanged = true;
@@ -325,7 +324,7 @@ static bool ShowStyleEditor(yoga::Style& style)
 				ImGui::TableNextRow();
 				ImGui::TableSetColumnIndex(0);
 				ImGui::SetNextItemWidth(-FLT_MIN);
-				if (auto v = CreateCompactValueInput("#w", "0", style.minDimension(yoga::Dimension::Width)))
+				if (auto v = CreateStyleLengthInput("#w", "0", style.minDimension(yoga::Dimension::Width)))
 				{
 					style.setMinDimension(yoga::Dimension::Width, *v);
 					valueChanged = true;
@@ -333,7 +332,7 @@ static bool ShowStyleEditor(yoga::Style& style)
 
 				ImGui::TableSetColumnIndex(1);
 				ImGui::SetNextItemWidth(-FLT_MIN);
-				if (auto v = CreateCompactValueInput("#h", "0", style.minDimension(yoga::Dimension::Height)))
+				if (auto v = CreateStyleLengthInput("#h", "0", style.minDimension(yoga::Dimension::Height)))
 				{
 					style.setMinDimension(yoga::Dimension::Height, *v);
 					valueChanged = true;
@@ -558,8 +557,8 @@ void WidgetTreeEditor::showSelectedWidgetEditor()
 			{
 				auto newChild = std::make_shared<Widget>();
 				{
-					newChild->style().setDimension(yoga::Dimension::Width, yoga::Style::Length::of<YGUnitPoint>(100));
-					newChild->style().setDimension(yoga::Dimension::Height, yoga::Style::Length::of<YGUnitPoint>(100));
+					newChild->style().setDimension(yoga::Dimension::Width, yoga::Style::Length::points(100));
+					newChild->style().setDimension(yoga::Dimension::Height, yoga::Style::Length::points(100));
 				}
 				m_selectedWidget->children.emplace_back(std::move(newChild));
 				m_treeChanged = true;

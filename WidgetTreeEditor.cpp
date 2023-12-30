@@ -391,7 +391,7 @@ bool RenderWidgetTreeNode(std::shared_ptr<Widget> widget, std::shared_ptr<Widget
 
 	if (not showChildren)
 	{
-		ImGui::TreePush();
+		ImGui::TreePush("");
 	}
 
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
@@ -520,6 +520,12 @@ void WidgetTreeEditor::drawLayoutResults(LayoutResults layout)
 
 void WidgetTreeEditor::showPropertyEditor(Widget& widget)
 {
+	Float4 borderColor = widget.borderColor.toFloat4();
+	if (ImGui::ColorEdit4("BorderColor", borderColor.getPointer()))
+	{
+		widget.borderColor = ColorF{ borderColor };
+	}
+
 	if (auto label = dynamic_cast<Label*>(&widget))
 	{
 		std::string buffer = Unicode::ToUTF8(label->text());
@@ -528,10 +534,10 @@ void WidgetTreeEditor::showPropertyEditor(Widget& widget)
 			label->setText(Unicode::FromUTF8(buffer));
 		}
 
-		Float4 color = label->color().toFloat4();
-		if (ImGui::ColorEdit4("TextColor", color.getPointer()))
+		Float4 textColor = label->color().toFloat4();
+		if (ImGui::ColorEdit4("TextColor", textColor.getPointer()))
 		{
-			label->setColor(ColorF{ color });
+			label->setColor(ColorF{ textColor });
 		}
 	}
 }
@@ -543,6 +549,8 @@ void WidgetTreeEditor::showSelectedWidgetEditor()
 	if (m_selectedWidget && ImGui::Begin("Selected Widget", &isItemSelected, ImGuiWindowFlags_NoCollapse))
 	{
 		ImGui::Text("ID: 0x%08x (%s)", m_selectedWidget->id(), typeid(*m_selectedWidget.get()).name());
+
+		ImGui::PushID(m_selectedWidget.get());
 
 		if (ImGui::CollapsingHeader("Tree"))
 		{
@@ -559,15 +567,17 @@ void WidgetTreeEditor::showSelectedWidgetEditor()
 			{
 				auto newChild = std::make_shared<Widget>();
 				{
+					newChild->borderColor = Palette::Black;
 					newChild->style().setDimension(yoga::Dimension::Width, yoga::Style::Length::points(100));
 					newChild->style().setDimension(yoga::Dimension::Height, yoga::Style::Length::points(100));
+					newChild->style().setBorder(yoga::Edge::All, yoga::Style::Length::points(1));
 				}
 				m_selectedWidget->children.emplace_back(std::move(newChild));
 				m_treeChanged = true;
 			}
 			if (ImGui::Button("[+] Add Child Label"))
 			{
-				m_selectedWidget->children.emplace_back(std::make_shared<Label>(U"Hoge", Palette::Black));
+				m_selectedWidget->children.emplace_back(std::make_shared<Label>());
 				m_treeChanged = true;
 			}
 			ImGui::EndDisabled();
@@ -601,6 +611,8 @@ void WidgetTreeEditor::showSelectedWidgetEditor()
 				}
 			}
 		}
+
+		ImGui::PopID();
 
 		ImGui::End();
 	}

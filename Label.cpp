@@ -28,12 +28,10 @@ static void CalculatePos(Vec2& penPos, Vec2& renderSize, const Glyph& glyph, con
 	}
 }
 
-Label::Label(const StringView text, ColorF color, Font font)
-	: m_text(text)
-	, m_color(color)
-	, m_font(font)
+Label::Label()
 {
-	m_glyphCache = m_font.getGlyphs(m_text);
+	borderColor = Color::Zero();
+	m_glyphCache = { };
 }
 
 void Label::setText(const StringView text)

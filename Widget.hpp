@@ -38,6 +38,8 @@ public:
 
 	String name;
 
+	ColorF borderColor = Palette::Black;
+
 	std::list<std::shared_ptr<Widget>> children;
 
 	int64 id() const { return m_id; }
@@ -70,7 +72,9 @@ protected:
 
 	void drawChildren() const;
 
-	virtual void drawContent(const LayoutResults&) const;
+	virtual void drawBorder(const LayoutResults& layout) const;
+
+	virtual void drawContent(const LayoutResults& layout) const;
 
 	virtual void onLayoutNodeAttach(facebook::yoga::Node&) { }
 

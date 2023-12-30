@@ -8,7 +8,7 @@ class Label : public Widget
 
 public:
 
-	Label(const StringView text, ColorF color = Palette::White, Font font = SimpleGUI::GetFont());
+	Label();
 
 public:
 
@@ -26,11 +26,11 @@ public:
 
 private:
 
-	String m_text;
+	String m_text = U"";
 
-	Font m_font;
+	Font m_font = SimpleGUI::GetFont();
 
-	ColorF m_color;
+	ColorF m_color = Palette::White;
 
 	Array<Glyph> m_glyphCache;
 

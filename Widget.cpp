@@ -88,7 +88,9 @@ void Widget::queryAll(const StringView value, Array<std::shared_ptr<Widget>>& re
 
 void Widget::draw()
 {
-	drawContent(*layoutResults());
+	auto& layout = layoutResults().value();
+	drawContent(layout);
+	drawBorder(layout);
 }
 
 void Widget::markLayoutDirty()
@@ -107,9 +109,21 @@ void Widget::drawChildren() const
 	}
 }
 
+void Widget::drawBorder(const LayoutResults& layout) const
+{
+	if (borderColor.a == 0)
+	{
+		return;
+	}
+
+	for (auto polygon : Geometry2D::Subtract(layout.rect().asPolygon(), layout.rectWithoutBorder()))
+	{
+		polygon.draw(borderColor);
+	}
+}
+
 void Widget::drawContent(const LayoutResults& layout) const
 {
-	layout.rect().drawFrame(1, Palette::Black);
 	drawChildren();
 }
 
@@ -122,7 +136,7 @@ void Widget::attachNode(facebook::yoga::Node& node)
 
 	m_node = &node;
 	m_node->setStyle(m_styleCache);
-	
+
 	onLayoutNodeAttach(*m_node);
 }
 

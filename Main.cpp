@@ -24,13 +24,15 @@ void Main()
 		rootWidget->style().setAlignItems(facebook::yoga::Align::Center);
 
 		// labelWidgetをrootWidgetに追加
-		auto labelWidget = std::make_shared<Label>(U"Siv3DYogaTest", Palette::Black);
+		auto labelWidget = std::make_shared<Label>();
+		labelWidget->setText(U"Siv3DYogaTest");
+		labelWidget->setColor(Palette::Black);
 		rootWidget->children.emplace_back(std::move(labelWidget));
 	}
 
 	// UIを編集するエディタ
 	WidgetTreeEditor editor{ rootWidget };
-
+	
 	// UIからLayoutTreeを構築
 	LayoutTree tree{ rootWidget };
 

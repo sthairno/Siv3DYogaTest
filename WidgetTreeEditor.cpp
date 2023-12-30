@@ -577,7 +577,12 @@ void WidgetTreeEditor::showSelectedWidgetEditor()
 			}
 			if (ImGui::Button("[+] Add Child Label"))
 			{
-				m_selectedWidget->children.emplace_back(std::make_shared<Label>());
+				auto newChild = std::make_shared<Label>();
+				{
+					newChild->setColor(Palette::Black);
+					newChild->setText(U"Label");
+				}
+				m_selectedWidget->children.emplace_back(std::move(newChild));
 				m_treeChanged = true;
 			}
 			ImGui::EndDisabled();
